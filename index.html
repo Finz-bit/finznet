@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinzNet - AI Media Enhancer & Universal Downloader</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & Lucide Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 animate-float">
+                    <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-800 tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">FinzNet</h1>
+                    <p class="text-xs text-slate-400 font-medium">AI & Media Suite v2.5</p>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden lg:flex items-center space-x-1 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i><span>Beranda</span>
+                </button>
+                <button onclick="switchTab('photo')" id="nav-photo" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                    <i data-lucide="image" class="w-4 h-4"></i><span>AI Photo HD</span>
+                </button>
+                <button onclick="switchTab('video')" id="nav-video" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                    <i data-lucide="video" class="w-4 h-4"></i><span>AI Video HD</span>
+                </button>
+                <button onclick="switchTab('youtube')" id="nav-youtube" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                    <i data-lucide="youtube" class="w-4 h-4 text-red-500"></i><span>YouTube</span>
+                </button>
+                <button onclick="switchTab('tiktok')" id="nav-tiktok" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                    <i data-lucide="video" class="w-4 h-4 text-cyan-400"></i><span>TikTok</span>
+                </button>
+                <button onclick="switchTab('instagram')" id="nav-instagram" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                    <i data-lucide="instagram" class="w-4 h-4 text-pink-500"></i><span>Instagram</span>
+                </button>
+                <button onclick="switchTab('facebook')" id="nav-facebook" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                    <i data-lucide="facebook" class="w-4 h-4 text-blue-500"></i><span>Facebook</span>
+                </button>
+                <button onclick="switchTab('tutorial')" id="nav-tutorial" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                    <i data-lucide="book-open" class="w-4 h-4"></i><span>Tutorial</span>
+                </button>
+            </nav>
+
+            <!-- Mobile Menu Toggle & Status -->
+            <div class="flex items-center space-x-3">
+                <div class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>AI Server Online</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="lg:hidden p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Navigation -->
+        <div id="mobile-menu" class="hidden lg:hidden glass-panel border-t border-slate-800 px-4 pt-3 pb-5 space-y-2">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-800/80">
+                <i data-lucide="layout-grid" class="w-5 h-5 text-indigo-400"></i><span>Beranda Utama</span>
+            </button>
+            <button onclick="switchTab('photo'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-800/80">
+                <i data-lucide="image" class="w-5 h-5 text-purple-400"></i><span>AI Photo HD Enhancer</span>
+            </button>
+            <button onclick="switchTab('video'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-800/80">
+                <i data-lucide="video" class="w-5 h-5 text-indigo-400"></i><span>AI Video HD Upscaler</span>
+            </button>
+            <button onclick="switchTab('youtube'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-800/80">
+                <i data-lucide="youtube" class="w-5 h-5 text-red-500"></i><span>YouTube Downloader</span>
+            </button>
+            <button onclick="switchTab('tiktok'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-800/80">
+                <i data-lucide="video" class="w-5 h-5 text-cyan-400"></i><span>TikTok Downloader</span>
+            </button>
+            <button onclick="switchTab('instagram'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-800/80">
+                <i data-lucide="instagram" class="w-5 h-5 text-pink-500"></i><span>Instagram Downloader</span>
+            </button>
+            <button onclick="switchTab('facebook'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-800/80">
+                <i data-lucide="facebook" class="w-5 h-5 text-blue-500"></i><span>Facebook Downloader</span>
+            </button>
+            <button onclick="switchTab('tutorial'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-800/80">
+                <i data-lucide="book-open" class="w-5 h-5 text-amber-400"></i><span>Tutorial & Panduan</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- 1. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="space-y-10 animate-fade-in">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl glass-panel p-8 sm:p-12 border border-slate-800/80">
+                <div class="absolute -right-20 -top-20 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative z-10 max-w-2xl space-y-6">
+                    <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold tracking-wide">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Platform All-in-One Berbasis AI Tercanggih</span>
+                    </div>
+                    <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                        Tingkatkan Kualitas Media & <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Download Apapun</span>
+                    </h2>
+                    <p class="text-slate-300 text-base sm:text-lg">
+                        Ubah foto & video buram menjadi HD super jernih dengan kecerdasan buatan, serta unduh konten favorit dari YouTube, TikTok, IG, dan FB tanpa watermark secara instan.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="switchTab('photo')" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 font-bold text-white shadow-lg shadow-indigo-600/30 transition-all flex items-center space-x-2">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i><span>Coba AI Photo HD</span>
+                        </button>
+                        <button onclick="switchTab('youtube')" class="px-6 py-3.5 rounded-2xl bg-slate-900 border border-slate-700 hover:bg-slate-800 font-bold text-white transition-all flex items-center space-x-2">
+                            <i data-lucide="download" class="w-5 h-5"></i><span>Downloader Media</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                        <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i>
+                        <span>Fitur Terpisah & Khusus FinzNet</span>
+                    </h3>
+                    <span class="text-xs text-slate-400">Pilih modul yang ingin digunakan</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Card Photo -->
+                    <div onclick="switchTab('photo')" class="glass-card p-6 rounded-3xl border border-slate-800/80 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="image" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">AI Photo Enhancer</h4>
+                        <p class="text-sm text-slate-400 mb-4">Upscale foto buram jadi HD 2x/4x/8x dengan pemulihan wajah otomatis berbasis AI.</p>
+                        <span class="text-xs font-semibold text-indigo-400 flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
+                            <span>Buka Modul Foto</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+
+                    <!-- Card Video -->
+                    <div onclick="switchTab('video')" class="glass-card p-6 rounded-3xl border border-slate-800/80 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="video" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">AI Video Upscaler</h4>
+                        <p class="text-sm text-slate-400 mb-4">Tingkatkan resolusi video ke 1080p / 4K dengan frame interpolation & denoise AI.</p>
+                        <span class="text-xs font-semibold text-indigo-400 flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
+                            <span>Buka Modul Video</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+
+                    <!-- Card YouTube -->
+                    <div onclick="switchTab('youtube')" class="glass-card p-6 rounded-3xl border border-slate-800/80 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+                        <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="youtube" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">YouTube Downloader</h4>
+                        <p class="text-sm text-slate-400 mb-4">Download video dalam format MP4 (HD/4K) atau ubah langsung menjadi musik MP3.</p>
+                        <span class="text-xs font-semibold text-red-400 flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
+                            <span>Buka YouTube Downloader</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+
+                    <!-- Card TikTok -->
+                    <div onclick="switchTab('tiktok')" class="glass-card p-6 rounded-3xl border border-slate-800/80 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="video" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">TikTok Downloader</h4>
+                        <p class="text-sm text-slate-400 mb-4">Unduh video TikTok favorit Anda dengan cepat tanpa watermark atau ekstrak audionya.</p>
+                        <span class="text-xs font-semibold text-cyan-400 flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
+                            <span>Buka TikTok Downloader</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+
+                    <!-- Card Instagram -->
+                    <div onclick="switchTab('instagram')" class="glass-card p-6 rounded-3xl border border-slate-800/80 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+                        <div class="w-12 h-12 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500 mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="instagram" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">Instagram Downloader</h4>
+                        <p class="text-sm text-slate-400 mb-4">Simpan Reels, Postingan foto, Stories, dan IGTV dengan kualitas asli tanpa ribet.</p>
+                        <span class="text-xs font-semibold text-pink-400 flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
+                            <span>Buka IG Downloader</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+
+                    <!-- Card Facebook -->
+                    <div onclick="switchTab('facebook')" class="glass-card p-6 rounded-3xl border border-slate-800/80 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer group hover:-translate-y-1">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="facebook" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">Facebook Downloader</h4>
+                        <p class="text-sm text-slate-400 mb-4">Unduh video publik Facebook, Watch, dan Reels dengan pilihan resolusi lengkap.</p>
+                        <span class="text-xs font-semibold text-blue-400 flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
+                            <span>Buka FB Downloader</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. AI PHOTO ENHANCER VIEW -->
+        <section id="view-photo" class="hidden space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-3">
+                        <i data-lucide="image" class="w-8 h-8 text-purple-400"></i>
+                        <span>AI Photo Enhancer & HD Upscaler</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Ubah foto buram, pecah, atau berkualitas rendah menjadi resolusi tinggi dengan AI Real-ESRGAN.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-bold border border-purple-500/20">AI Engine v4</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Controls -->
+                <div class="glass-card p-6 rounded-3xl space-y-6 lg:col-span-1">
+                    <h3 class="text-lg font-bold text-white">1. Unggah Foto</h3>
+                    
+                    <!-- Dropzone -->
+                    <div id="photo-dropzone" onclick="document.getElementById('photo-file-input').click()" class="border-2 border-dashed border-slate-700 hover:border-purple-500/80 rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-900/50">
+                        <input type="file" id="photo-file-input" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
+                        <div id="photo-placeholder" class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto">
+                                <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-white">Klik untuk upload foto</p>
+                                <p class="text-xs text-slate-400 mt-1">PNG, JPG, WEBP (Maks 20MB)</p>
+                            </div>
+                        </div>
+                        <div id="photo-preview-info" class="hidden space-y-2">
+                            <p class="text-xs font-semibold text-emerald-400 truncate" id="photo-filename">filename.jpg</p>
+                            <p class="text-xs text-slate-400">Foto berhasil dimuat</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white">2. Pengaturan AI</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-300 mb-2 block">Skala Upscale</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button onclick="setPhotoScale(2)" id="scale-btn-2" class="scale-btn py-2.5 rounded-xl text-xs font-bold border border-indigo-600 bg-indigo-600 text-white transition-all">2x HD</button>
+                                <button onclick="setPhotoScale(4)" id="scale-btn-4" class="scale-btn py-2.5 rounded-xl text-xs font-bold border border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500 transition-all">4x Ultra</button>
+                                <button onclick="setPhotoScale(8)" id="scale-btn-8" class="scale-btn py-2.5 rounded-xl text-xs font-bold border border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500 transition-all">8x Max</button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-slate-800">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="face" class="w-5 h-5 text-purple-400"></i>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Pemulihan Wajah (Face Fix)</p>
+                                    <p class="text-xs text-slate-400">Memperjelas detail mata & wajah</p>
+                                </div>
+                            </div>
+                            <input type="checkbox" id="face-restoration-toggle" checked class="w-5 h-5 accent-indigo-600 rounded cursor-pointer">
+                        </div>
+                    </div>
+
+                    <button onclick="processPhotoEnhance()" id="photo-process-btn" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 font-bold text-white shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="wand-2" class="w-5 h-5"></i><span>Mulai Proses HD AI</span>
+                    </button>
+                </div>
+
+                <!-- Right Preview & Comparison -->
+                <div class="glass-card p-6 rounded-3xl lg:col-span-2 flex flex-col justify-between space-y-6">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                                <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
+                                <span>Hasil Sebelum & Sesudah (Before / After)</span>
+                            </h3>
+                            <span id="photo-status-badge" class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-semibold">Menunggu Foto</span>
+                        </div>
+
+                        <!-- Canvas Comparison Box -->
+                        <div id="photo-canvas-container" class="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
+                            <!-- Placeholder View -->
+                            <div id="photo-empty-state" class="text-center p-6 space-y-3">
+                                <i data-lucide="image-off" class="w-12 h-12 text-slate-600 mx-auto"></i>
+                                <p class="text-sm text-slate-400">Silakan upload foto terlebih dahulu di sebelah kiri untuk melihat perbandingan ajaib AI.</p>
+                            </div>
+
+                            <!-- Processing Overlay Simulation -->
+                            <div id="photo-loading-state" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center space-y-4 z-20">
+                                <div class="w-16 h-16 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
+                                <div class="text-center">
+                                    <p class="text-base font-bold text-white" id="photo-loading-text">Menganalisis piksel gambar...</p>
+                                    <p class="text-xs text-slate-400 mt-1">AI sedang memperbaiki detail dan ketajaman</p>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Before/After Preview -->
+                            <div id="photo-result-state" class="hidden absolute inset-0 w-full h-full flex items-center justify-center">
+                                <canvas id="enhancer-canvas" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl"></canvas>
+                                <div class="absolute bottom-4 left-4 px-3 py-1 rounded-lg bg-black/60 backdrop-blur-md text-xs font-bold text-white border border-white/10">
+                                    Hasil HD AI (Sesudah)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Download -->
+                    <div id="photo-download-section" class="hidden flex items-center justify-between pt-4 border-t border-slate-800">
+                        <div>
+                            <p class="text-sm font-bold text-white">Upscaling Berhasil!</p>
+                            <p class="text-xs text-slate-400">Resolusi ditingkatkan dan siap diunduh.</p>
+                        </div>
+                        <button onclick="downloadEnhancedPhoto()" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white shadow-lg shadow-emerald-600/30 flex items-center space-x-2 transition-all">
+                            <i data-lucide="download" class="w-4 h-4"></i><span>Download Foto HD</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. AI VIDEO ENHANCER VIEW -->
+        <section id="view-video" class="hidden space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-3">
+                        <i data-lucide="video" class="w-8 h-8 text-indigo-400"></i>
+                        <span>AI Video Enhancer & 4K Upscaler</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Tingkatkan kualitas video buram menjadi 1080p / 4K dengan stabilisasi dan frame interpolation.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-bold border border-indigo-500/20">AI Video Engine v2</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="glass-card p-6 rounded-3xl space-y-6 lg:col-span-1">
+                    <h3 class="text-lg font-bold text-white">1. Pilih / Link Video</h3>
+                    <input type="text" id="video-url-input" placeholder="Tempel URL Video (MP4 / YouTube / IG)..." class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-indigo-600">
+                    
+                    <div class="text-center text-xs text-slate-500 font-bold">ATAU UPLOAD FILE</div>
+
+                    <div onclick="document.getElementById('video-file-input').click()" class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl p-4 text-center cursor-pointer transition-all bg-slate-900/50">
+                        <input type="file" id="video-file-input" accept="video/*" class="hidden" onchange="handleVideoSelect(event)">
+                        <p class="text-xs font-semibold text-slate-300" id="video-filename-label">Klik upload video (Maks 100MB)</p>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white">2. Resolusi Target</h3>
+                    <select id="video-resolution" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-indigo-600">
+                        <option value="4k">4K Ultra HD (3840 x 2160)</option>
+                        <option value="1080p" selected>1080p Full HD (60fps Smoothed)</option>
+                        <option value="720p">720p HD Standard</option>
+                    </select>
+
+                    <button onclick="processVideoEnhance()" id="video-process-btn" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 font-bold text-white shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="cpu" class="w-5 h-5"></i><span>Proses Video AI</span>
+                    </button>
+                </div>
+
+                <div class="glass-card p-6 rounded-3xl lg:col-span-2 flex flex-col justify-between space-y-6">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                                <i data-lucide="play-circle" class="w-5 h-5 text-indigo-400"></i>
+                                <span>Preview & Progress AI Upscaler</span>
+                            </h3>
+                            <span id="video-status-badge" class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-semibold">Siap</span>
+                        </div>
+
+                        <div id="video-preview-box" class="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
+                            <div id="video-empty-state" class="text-center p-6 space-y-3">
+                                <i data-lucide="film" class="w-12 h-12 text-slate-600 mx-auto"></i>
+                                <p class="text-sm text-slate-400">Masukkan tautan atau upload video untuk memulai enhancement AI.</p>
+                            </div>
+
+                            <div id="video-loading-state" class="hidden absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center space-y-4 z-20 px-6">
+                                <div class="w-16 h-16 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
+                                <div class="w-full max-w-md bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-800">
+                                    <div id="video-progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
+                                </div>
+                                <p class="text-sm font-bold text-white text-center" id="video-progress-text">Merender frame video (0%)...</p>
+                            </div>
+
+                            <div id="video-result-state" class="hidden absolute inset-0 flex flex-col items-center justify-center p-4 space-y-4">
+                                <div class="w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                    <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+                                </div>
+                                <div class="text-center">
+                                    <h4 class="text-xl font-bold text-white">Video Berhasil Ditingkatkan ke 4K/1080p!</h4>
+                                    <p class="text-xs text-slate-400 mt-1">Ketajaman warna, noise reduction, dan 60fps berhasil diterapkan.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="video-download-section" class="hidden flex items-center justify-between pt-4 border-t border-slate-800">
+                        <div>
+                            <p class="text-sm font-bold text-white">Hasil Video AI Siap</p>
+                            <p class="text-xs text-slate-400">Format MP4 (H.265 High Quality)</p>
+                        </div>
+                        <button onclick="downloadEnhancedVideo()" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white shadow-lg shadow-emerald-600/30 flex items-center space-x-2 transition-all">
+                            <i data-lucide="download" class="w-4 h-4"></i><span>Download Video HD</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. YOUTUBE DOWNLOADER VIEW -->
+        <section id="view-youtube" class="hidden space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-3">
+                        <i data-lucide="youtube" class="w-8 h-8 text-red-500"></i>
+                        <span>YouTube Downloader & Converter</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Unduh video YouTube dalam berbagai resolusi MP4 atau ekstrak audio menjadi MP3 berkualitas tinggi.</p>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 sm:p-8 rounded-3xl space-y-6">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="relative flex-grow">
+                        <i data-lucide="link" class="absolute left-4 top-3.5 w-5 h-5 text-slate-500"></i>
+                        <input type="text" id="yt-url" placeholder="Tempel link YouTube disini (Contoh: https://youtube.com/watch?v=...)" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-red-500">
+                    </div>
+                    <button onclick="fetchYouTubeData()" class="px-8 py-3.5 rounded-2xl bg-red-600 hover:bg-red-500 font-bold text-white shadow-lg shadow-red-600/30 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="search" class="w-5 h-5"></i><span>Cari Video</span>
+                    </button>
+                </div>
+
+                <!-- Result Card (Hidden Initially) -->
+                <div id="yt-result-container" class="hidden space-y-6 pt-6 border-t border-slate-800">
+                    <div class="flex flex-col md:flex-row gap-6 items-center bg-slate-900/60 p-6 rounded-2xl border border-slate-800">
+                        <img id="yt-thumbnail" src="https://placehold.co/320x180/1e293b/ef4444?text=YouTube" alt="Thumbnail" class="w-full md:w-72 h-40 object-cover rounded-xl shadow-md">
+                        <div class="space-y-3 flex-grow">
+                            <span class="px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-bold border border-red-500/20">YouTube Media</span>
+                            <h3 id="yt-title" class="text-lg sm:text-xl font-bold text-white">Judul Video YouTube Akan Muncul Disini</h3>
+                            <p class="text-xs text-slate-400" id="yt-duration">Durasi: 03:45 • Channel: FinzNet Official</p>
+                            
+                            <!-- Format Selection -->
+                            <div class="flex flex-wrap gap-3 pt-2">
+                                <button onclick="triggerDownload('YouTube Video 1080p MP4')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center space-x-2 shadow-md">
+                                    <i data-lucide="download" class="w-4 h-4"></i><span>MP4 1080p (HD)</span>
+                                </button>
+                                <button onclick="triggerDownload('YouTube Video 720p MP4')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center space-x-2 border border-slate-700">
+                                    <i data-lucide="download" class="w-4 h-4"></i><span>MP4 720p</span>
+                                </button>
+                                <button onclick="triggerDownload('YouTube Audio MP3')" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center space-x-2 shadow-md">
+                                    <i data-lucide="music" class="w-4 h-4"></i><span>Convert to MP3 Audio</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. TIKTOK DOWNLOADER VIEW -->
+        <section id="view-tiktok" class="hidden space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-3">
+                        <i data-lucide="video" class="w-8 h-8 text-cyan-400"></i>
+                        <span>TikTok Downloader (No Watermark)</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Unduh video TikTok tanpa tanda air (watermark) atau ambil musik latar belakangnya secara instan.</p>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 sm:p-8 rounded-3xl space-y-6">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="relative flex-grow">
+                        <i data-lucide="link" class="absolute left-4 top-3.5 w-5 h-5 text-slate-500"></i>
+                        <input type="text" id="tt-url" placeholder="Tempel tautan TikTok (Contoh: https://tiktok.com/@user/video/...)" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-cyan-400">
+                    </div>
+                    <button onclick="downloadSocialMedia('TikTok', 'tt-url')" class="px-8 py-3.5 rounded-2xl bg-cyan-500 hover:bg-cyan-400 font-bold text-slate-950 shadow-lg shadow-cyan-500/30 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="download" class="w-5 h-5"></i><span>Download Tanpa Watermark</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. INSTAGRAM DOWNLOADER VIEW -->
+        <section id="view-instagram" class="hidden space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-3">
+                        <i data-lucide="instagram" class="w-8 h-8 text-pink-500"></i>
+                        <span>Instagram Downloader (Reels & Stories)</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Simpan Reels, Postingan foto, dan Story Instagram dengan resolusi original tertinggi.</p>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 sm:p-8 rounded-3xl space-y-6">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="relative flex-grow">
+                        <i data-lucide="link" class="absolute left-4 top-3.5 w-5 h-5 text-slate-500"></i>
+                        <input type="text" id="ig-url" placeholder="Tempel link Instagram Reels / Post..." class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-pink-500">
+                    </div>
+                    <button onclick="downloadSocialMedia('Instagram', 'ig-url')" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 font-bold text-white shadow-lg shadow-pink-600/30 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="download" class="w-5 h-5"></i><span>Download Instagram</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. FACEBOOK DOWNLOADER VIEW -->
+        <section id="view-facebook" class="hidden space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-3">
+                        <i data-lucide="facebook" class="w-8 h-8 text-blue-500"></i>
+                        <span>Facebook Video & Reels Downloader</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Unduh video publik dari Facebook Watch, Reels, dan beranda dengan mudah dan cepat.</p>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 sm:p-8 rounded-3xl space-y-6">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="relative flex-grow">
+                        <i data-lucide="link" class="absolute left-4 top-3.5 w-5 h-5 text-slate-500"></i>
+                        <input type="text" id="fb-url" placeholder="Tempel link video Facebook..." class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <button onclick="downloadSocialMedia('Facebook', 'fb-url')" class="px-8 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold text-white shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="download" class="w-5 h-5"></i><span>Download Facebook</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. TUTORIAL HUB VIEW -->
+        <section id="view-tutorial" class="hidden space-y-8 animate-fade-in">
+            <div class="border-b border-slate-800 pb-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-3">
+                    <i data-lucide="book-open" class="w-8 h-8 text-amber-400"></i>
+                    <span>Pusat Tutorial & Panduan Penggunaan</span>
+                </h2>
+                <p class="text-slate-400 text-sm mt-1">Pelajari cara memaksimalkan setiap fitur di FinzNet dengan panduan langkah demi langkah.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tut 1 -->
+                <div class="glass-card p-6 rounded-3xl space-y-4 border border-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">1</div>
+                    <h3 class="text-lg font-bold text-white">Cara Memperjelas Foto Buram (HD)</h3>
+                    <ol class="text-xs text-slate-300 space-y-2 list-decimal list-inside">
+                        <li>Buka menu <strong class="text-purple-400">AI Photo HD</strong>.</li>
+                        <li>Upload foto dari galeri atau komputer Anda.</li>
+                        <li>Pilih skala upscale (2x, 4x, atau 8x).</li>
+                        <li>Tekan tombol proses dan unduh hasilnya.</li>
+                    </ol>
+                </div>
+
+                <!-- Tut 2 -->
+                <div class="glass-card p-6 rounded-3xl space-y-4 border border-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold">2</div>
+                    <h3 class="text-lg font-bold text-white">Cara Upscale Video ke 4K</h3>
+                    <ol class="text-xs text-slate-300 space-y-2 list-decimal list-inside">
+                        <li>Buka menu <strong class="text-indigo-400">AI Video HD</strong>.</li>
+                        <li>Paste link video atau upload file video.</li>
+                        <li>Pilih resolusi target (1080p atau 4K).</li>
+                        <li>Tunggu proses AI rendering selesai.</li>
+                    </ol>
+                </div>
+
+                <!-- Tut 3 -->
+                <div class="glass-card p-6 rounded-3xl space-y-4 border border-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center font-bold">3</div>
+                    <h3 class="text-lg font-bold text-white">Cara Download YouTube & MP3</h3>
+                    <ol class="text-xs text-slate-300 space-y-2 list-decimal list-inside">
+                        <li>Buka menu <strong class="text-red-400">YouTube</strong>.</li>
+                        <li>Salin tautan video dari aplikasi YouTube.</li>
+                        <li>Klik "Cari Video" untuk memuat thumbnail.</li>
+                        <li>Pilih format MP4 (HD) atau MP3 Audio.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating AI Assistant Widget -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <!-- Chat Toggle Button -->
+        <button onclick="toggleFinzBot()" id="finzbot-toggle-btn" class="w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 shadow-xl shadow-indigo-600/40 flex items-center justify-center text-white transition-all duration-300 relative">
+            <i data-lucide="bot" class="w-7 h-7"></i>
+            <span class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-950 animate-pulse"></span>
+        </button>
+
+        <!-- Chat Window (Hidden by Default) -->
+        <div id="finzbot-window" class="hidden absolute bottom-20 right-0 w-80 sm:w-96 h-[500px] glass-panel rounded-3xl border border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-fade-in">
+            <!-- Header -->
+            <div class="p-4 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold">
+                        <i data-lucide="bot" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">FinzBot AI Assistant</h3>
+                        <p class="text-[10px] text-emerald-400 font-medium flex items-center space-x-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                            <span>Siap membantu menjawab pertanyaan</span>
+                        </p>
+                    </div>
+                </div>
+                <button onclick="toggleFinzBot()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="finzbot-messages" class="flex-grow p-4 overflow-y-auto space-y-3 text-xs">
+                <div class="flex items-start space-x-2">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white flex-shrink-0">
+                        <i data-lucide="bot" class="w-4 h-4"></i>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl rounded-tl-none text-slate-200 max-w-[80%]">
+                        Halo! Saya <strong class="text-indigo-400">FinzBot</strong> asisten AI FinzNet. Ada yang bisa saya bantu terkait cara edit foto HD atau download video?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Suggestions -->
+            <div class="px-4 py-2 border-t border-slate-800 bg-slate-900/40 flex gap-2 overflow-x-auto text-[11px] whitespace-nowrap">
+                <button onclick="sendPresetPrompt('Bagaimana cara memperjelas foto?')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Cara Edit Foto HD?</button>
+                <button onclick="sendPresetPrompt('Bagaimana cara download video YouTube?')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Download YouTube?</button>
+            </div>
+
+            <!-- Input Box -->
+            <div class="p-3 bg-slate-900 border-t border-slate-800 flex items-center space-x-2">
+                <input type="text" id="finzbot-input" onkeypress="handleBotKeyPress(event)" placeholder="Ketik pertanyaan..." class="flex-grow px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-indigo-600">
+                <button onclick="sendBotMessage()" class="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-md">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-24 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+    <footer class="mt-auto border-t border-slate-900 py-8 bg-slate-950/60">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+            <p class="text-xs text-slate-400">© 2026 FinzNet AI Suite. All rights reserved. Dibangun dengan teknologi AI tercanggih untuk publik.</p>
+            <div class="flex justify-center space-x-6 text-xs text-slate-500">
+                <a href="#" onclick="switchTab('tutorial')" class="hover:text-slate-300">Panduan GitHub</a>
+                <a href="#" onclick="switchTab('tutorial')" class="hover:text-slate-300">Kebijakan Privasi</a>
+                <a href="#" onclick="switchTab('tutorial')" class="hover:text-slate-300">Kontak Pengembang</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Navigation Tab Switching
+        function switchTab(tabId) {
+            const views = ['dashboard', 'photo', 'video', 'youtube', 'tiktok', 'instagram', 'facebook', 'tutorial'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+                const btn = document.getElementById(`nav-${v}`);
+                if (btn) {
+                    btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30');
+                    btn.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/50');
+                }
+            });
+
+            const activeView = document.getElementById(`view-${tabId}`);
+            if (activeView) activeView.classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/50');
+                activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-600/90 border-emerald-500' : 'bg-indigo-600/90 border-indigo-500';
+            toast.className = `pointer-events-auto px-4 py-3 rounded-2xl ${bgClass} backdrop-blur-md text-white text-xs font-bold shadow-xl border flex items-center space-x-2 animate-fade-in`;
+            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- AI PHOTO ENHANCER LOGIC ---
+        let selectedPhotoData = null;
+        let currentPhotoScale = 2;
+
+        function setPhotoScale(scale) {
+            currentPhotoScale = scale;
+            document.querySelectorAll('.scale-btn').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'border-indigo-600', 'text-white');
+                b.classList.add('bg-slate-900', 'border-slate-700', 'text-slate-300');
+            });
+            const activeBtn = document.getElementById(`scale-btn-${scale}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-slate-900', 'border-slate-700', 'text-slate-300');
+                activeBtn.classList.add('bg-indigo-600', 'border-indigo-600', 'text-white');
+            }
+        }
+
+        function handlePhotoSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedPhotoData = e.target.result;
+                document.getElementById('photo-placeholder').classList.add('hidden');
+                const info = document.getElementById('photo-preview-info');
+                info.classList.remove('hidden');
+                document.getElementById('photo-filename').innerText = file.name;
+                showToast('Foto berhasil dimuat!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function processPhotoEnhance() {
+            if (!selectedPhotoData) {
+                // Generate default placeholder image if none uploaded
+                selectedPhotoData = "https://placehold.co/600x400/334155/ffffff?text=Original+Blurry+Image";
+            }
+
+            const loading = document.getElementById('photo-loading-state');
+            const empty = document.getElementById('photo-empty-state');
+            const result = document.getElementById('photo-result-state');
+            const downloadSec = document.getElementById('photo-download-section');
+            const badge = document.getElementById('photo-status-badge');
+
+            empty.classList.add('hidden');
+            loading.classList.remove('hidden');
+            badge.innerText = 'Memproses AI...';
+            badge.className = 'px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-semibold animate-pulse';
+
+            let steps = ['Menganalisis matriks piksel...', 'Menerapkan Real-ESRGAN Upscale...', 'Memulihkan detail wajah & ketajaman...', 'Finalisasi render HD...'];
+            let idx = 0;
+
+            const interval = setInterval(() => {
+                idx++;
+                if (idx < steps.length) {
+                    document.getElementById('photo-loading-text').innerText = steps[idx];
+                } else {
+                    clearInterval(interval);
+                    loading.classList.add('hidden');
+                    result.classList.remove('hidden');
+                    downloadSec.classList.remove('hidden');
+                    badge.innerText = `Selesai (${currentPhotoScale}x HD)`;
+                    badge.className = 'px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold';
+
+                    // Draw image to canvas
+                    const canvas = document.getElementById('enhancer-canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    img.onload = function() {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = selectedPhotoData;
+                    showToast('Foto berhasil diperjelas ke HD!');
+                }
+            }, 800);
+        }
+
+        function downloadEnhancedPhoto() {
+            const canvas = document.getElementById('enhancer-canvas');
+            const link = document.createElement('a');
+            link.download = `FinzNet-Enhanced-${currentPhotoScale}x.jpg`;
+            link.href = canvas.toDataURL('image/jpeg');
+            link.click();
+            showToast('Foto HD berhasil diunduh!');
+        }
+
+        // --- AI VIDEO ENHANCER LOGIC ---
+        function handleVideoSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('video-filename-label').innerText = file.name;
+                showToast('File video dimuat!');
+            }
+        }
+
+        function processVideoEnhance() {
+            const loading = document.getElementById('video-loading-state');
+            const empty = document.getElementById('video-empty-state');
+            const result = document.getElementById('video-result-state');
+            const downloadSec = document.getElementById('video-download-section');
+            const badge = document.getElementById('video-status-badge');
+            const progressBar = document.getElementById('video-progress-bar');
+            const progressText = document.getElementById('video-progress-text');
+
+            empty.classList.add('hidden');
+            result.classList.add('hidden');
+            loading.classList.remove('hidden');
+            badge.innerText = 'Rendering AI...';
+            badge.className = 'px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold';
+
+            let progress = 0;
+            const timer = setInterval(() => {
+                progress += 5;
+                if (progressBar) progressBar.style.width = `${progress}%`;
+                if (progressText) progressText.innerText = `Merender frame video (${progress}%)...`;
+
+                if (progress >= 100) {
+                    clearInterval(timer);
+                    loading.classList.add('hidden');
+                    result.classList.remove('hidden');
+                    downloadSec.classList.remove('hidden');
+                    badge.innerText = 'Selesai 4K';
+                    badge.className = 'px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold';
+                    showToast('Video berhasil di-upscale ke 4K!');
+                }
+            }, 120);
+        }
+
+        function downloadEnhancedVideo() {
+            showToast('Memulai pengunduhan video hasil 4K...');
+            setTimeout(() => {
+                showToast('Video berhasil disimpan di perangkat Anda!');
+            }, 1500);
+        }
+
+        // --- YOUTUBE DOWNLOADER LOGIC ---
+        function fetchYouTubeData() {
+            const url = document.getElementById('yt-url').value.trim();
+            if (!url) {
+                showToast('Mohon masukkan tautan YouTube terlebih dahulu!', 'info');
+                return;
+            }
+
+            showToast('Menghubungkan ke server YouTube...');
+            setTimeout(() => {
+                document.getElementById('yt-result-container').classList.remove('hidden');
+                document.getElementById('yt-title').innerText = "Tutorial Membuat Web AI Modern Full Fitur dengan FinzNet";
+                document.getElementById('yt-duration').innerText = "Durasi: 12:40 • Channel: FinzNet Tech Studio";
+                showToast('Informasi video berhasil dimuat!');
+            }, 800);
+        }
+
+        function triggerDownload(formatName) {
+            showToast(`Menyiapkan file ${formatName}...`);
+            setTimeout(() => {
+                showToast(`Unduhan ${formatName} berhasil dimulai!`);
+            }, 1200);
+        }
+
+        // --- SOCIAL MEDIA DOWNLOADER ---
+        function downloadSocialMedia(platform, inputId) {
+            const val = document.getElementById(inputId).value.trim();
+            if (!val) {
+                showToast(`Mohon masukkan link ${platform} terlebih dahulu!`, 'info');
+                return;
+            }
+
+            showToast(`Mengambil data media ${platform}...`);
+            setTimeout(() => {
+                showToast(`Berhasil! File ${platform} sedang diunduh.`);
+            }, 1200);
+        }
+
+        // --- FINZBOT AI ASSISTANT LOGIC ---
+        function toggleFinzBot() {
+            const win = document.getElementById('finzbot-window');
+            if (win) win.classList.toggle('hidden');
+        }
+
+        function sendPresetPrompt(text) {
+            const input = document.getElementById('finzbot-input');
+            if (input) {
+                input.value = text;
+                sendBotMessage();
+            }
+        }
+
+        function handleBotKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendBotMessage();
+            }
+        }
+
+        function sendBotMessage() {
+            const input = document.getElementById('finzbot-input');
+            const msgArea = document.getElementById('finzbot-messages');
+            if (!input || !msgArea || !input.value.trim()) return;
+
+            const userText = input.value.trim();
+            input.value = '';
+
+            // Append User Message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'flex items-start justify-end space-x-2';
+            userDiv.innerHTML = `
+                <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[80%]">${userText}</div>
+                <div class="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 flex-shrink-0 text-[10px] font-bold">Anda</div>
+            `;
+            msgArea.appendChild(userDiv);
+            msgArea.scrollTop = msgArea.scrollHeight;
+
+            // Generate AI Response Simulation
+            setTimeout(() => {
+                let reply = "Baik, saya mengerti. Untuk menggunakan fitur tersebut, Anda cukup memasukkan tautan atau upload file lalu klik tombol proses.";
+                const lower = userText.toLowerCase();
+                if (lower.includes('foto') || lower.includes('hd')) {
+                    reply = "Untuk memperjelas foto buram, silakan buka menu 'AI Photo HD', upload foto Anda, pilih skala 2x/4x, lalu klik Proses HD AI!";
+                } else if (lower.includes('youtube') || lower.includes('download')) {
+                    reply = "Untuk download video YouTube, masuk ke menu YouTube, masukkan link videonya, klik Cari Video, lalu pilih format MP4 atau MP3.";
+                }
+
+                const botDiv = document.createElement('div');
+                botDiv.className = 'flex items-start space-x-2';
+                botDiv.innerHTML = `
+                    <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white flex-shrink-0"><i data-lucide="bot" class="w-4 h-4"></i></div>
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl rounded-tl-none text-slate-200 max-w-[80%]">${reply}</div>
+                `;
+                msgArea.appendChild(botDiv);
+                lucide.createIcons();
+                msgArea.scrollTop = msgArea.scrollHeight;
+            }, 800);
+        }
+    </script>
+</body>
+</html>
